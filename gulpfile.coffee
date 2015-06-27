@@ -10,4 +10,4 @@ coffee = require "gulp-coffee"
 gulp.task "default", ->
   gulp.src "src/resource-factory.coffee"
   .pipe coffee()
-  .pipe gulp.dest "dest/"
+  .pipe gulp.dest "dist/"
