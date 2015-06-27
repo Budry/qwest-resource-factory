@@ -49,7 +49,7 @@
             url = url.replace(match, value);
             delete params[paramName];
           } else {
-            url.replace(match(null));
+            url.replace(match, null);
           }
         }
         return qwest[method](url, params, options).then(function(response) {
