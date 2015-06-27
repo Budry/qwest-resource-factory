@@ -1,13 +1,13 @@
 {
-  "name": "kappajs-resource-factory",
+  "name": "qwest-resource-factory",
   "version": "0.9.0",
   "description": "Small library for better works with resources and qwest package",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/KappaJs/resource-factory.git"
+    "url": "git://github.com/Budry/qwest-resource-factory.git"
   },
-  "main": "dist/resource-factory.js"
+  "main": "dist/qwest-resource-factory.js",
   "keywords": [
     "kappajs",
     "resource",
@@ -17,7 +17,7 @@
   "author": "Ondřej Záruba <zarubaondra@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/KappaJs/resource-factory/issues"
+    "url": "https://github.com/Budry/qwest-resource-factory/issues"
   },
   "dependencies": {
     "merge": "~1.2",

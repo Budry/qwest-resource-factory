@@ -8,6 +8,6 @@ gulp = require "gulp"
 coffee = require "gulp-coffee"
 
 gulp.task "default", ->
-  gulp.src "src/resource-factory.coffee"
+  gulp.src "src/qwest-resource-factory.coffee"
   .pipe coffee()
   .pipe gulp.dest "dist/"
