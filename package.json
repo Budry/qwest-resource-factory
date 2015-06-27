@@ -19,6 +19,7 @@
     "url": "https://github.com/KappaJs/resource-factory/issues"
   },
   "dependencies": {
-    "merge": "~1.2"
+    "merge": "~1.2",
+    "qwest": "~1.7"
   }
 }
