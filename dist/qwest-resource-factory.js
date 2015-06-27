@@ -17,6 +17,9 @@
   ResourceFactory = function(url, api) {
     var Resource, action, allowedMethods, defaultParams, method, options;
     allowedMethods = ["post", "get", "put", "delete"];
+    options = {
+      dataType: "json"
+    };
     Resource = function() {};
     for (action in api) {
       options = api[action];
@@ -25,27 +28,38 @@
         throw "Invalid method";
       }
       defaultParams = options.params;
-      Resource.prototype[action] = function(params) {
+      Resource.prototype[action] = function(params, success, error) {
         var i, len, match, matches, paramName, value;
         if (params == null) {
           params = null;
         }
+        if (success == null) {
+          success = null;
+        }
+        if (error == null) {
+          error = null;
+        }
         params = merge(defaultParams, params);
-        matches = url.match(/:([^:]+):/g);
+        matches = url.match(/:([^:]+):/g) || [];
         for (i = 0, len = matches.length; i < len; i++) {
           match = matches[i];
           paramName = match.substr(1, match.length - 2);
           if (params[paramName] != null) {
             value = params[paramName];
-            console.log(value);
             url = url.replace(match, value);
             delete params[paramName];
           } else {
             url.replace(match(null));
           }
         }
-        return qwest[method](url, params, {
-          dataType: "json"
+        return qwest[method](url, params, options).then(function(response) {
+          if (success != null) {
+            return success(response);
+          }
+        })['catch'](function(e, response) {
+          if (error != null) {
+            return error(e, response);
+          }
         });
       };
     }

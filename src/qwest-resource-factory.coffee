@@ -12,8 +12,10 @@ merge = require "merge"
 ResourceFactory = (url, api) ->
 
   allowedMethods = ["post", "get", "put", "delete"]
-
+  options =
+    dataType: "json"
   Resource = () ->
+
   for action, options of api
 
     method = options.method.toLowerCase()
@@ -22,10 +24,9 @@ ResourceFactory = (url, api) ->
 
     defaultParams = options.params
 
-    Resource.prototype[action] = (params = null) ->
+    Resource.prototype[action] = (params = null, success = null, error = null) ->
 
       params = merge defaultParams, params
-
       matches = url.match(/:([^:]+):/g) || []
 
       for match in matches
@@ -37,8 +38,12 @@ ResourceFactory = (url, api) ->
         else
           url.replace match null
 
-      return qwest[method] url, params,
-        dataType: "json"
+      return qwest[method](url, params, options).then((response) ->
+        success(response) if success?
+      )['catch']((e, response) ->
+        error(e, response) if error?
+      )
+
   return new Resource()
 
 module.exports = ResourceFactory
