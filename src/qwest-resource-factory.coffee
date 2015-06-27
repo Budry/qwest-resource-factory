@@ -32,7 +32,6 @@ ResourceFactory = (url, api) ->
         paramName = match.substr(1, match.length - 2)
         if params[paramName]?
           value = params[paramName]
-          console.log value
           url = url.replace match, value
           delete params[paramName]
         else
