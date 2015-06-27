@@ -1,0 +1,21 @@
+{
+  "name": "kappajs-resource-factory",
+  "version": "1.0.0",
+  "description": "Small library for better works with resources and qwest package ",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/KappaJs/resource-factory.git"
+  },
+  "keywords": [
+    "kappajs",
+    "resource",
+    "qwest",
+    "factory"
+  ],
+  "author": "Ondřej Záruba <zarubaondra@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KappaJs/resource-factory/issues"
+  }
+}
