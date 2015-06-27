@@ -1,6 +1,6 @@
 {
   "name": "kappajs-resource-factory",
-  "version": "1.0.0",
+  "version": "0.9.0",
   "description": "Small library for better works with resources and qwest package ",
   "main": "index.js",
   "repository": {
