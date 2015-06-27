@@ -40,6 +40,8 @@
             console.log(value);
             url = url.replace(match, value);
             delete params[paramName];
+          } else {
+            url.replace(match(null));
           }
         }
         return qwest[method](url, params, {
