@@ -17,9 +17,6 @@
   ResourceFactory = function(url, api) {
     var Resource, action, allowedMethods, defaultParams, method, options;
     allowedMethods = ["post", "get", "put", "delete"];
-    options = {
-      dataType: "json"
-    };
     Resource = function() {};
     for (action in api) {
       options = api[action];
@@ -52,6 +49,9 @@
             url.replace(match, null);
           }
         }
+        options = {
+          dataType: "json"
+        };
         return qwest[method](url, params, options).then(function(response) {
           if (success != null) {
             return success(response);

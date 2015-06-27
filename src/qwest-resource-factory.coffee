@@ -12,8 +12,6 @@ merge = require "merge"
 ResourceFactory = (url, api) ->
 
   allowedMethods = ["post", "get", "put", "delete"]
-  options =
-    dataType: "json"
   Resource = () ->
 
   for action, options of api
@@ -37,7 +35,8 @@ ResourceFactory = (url, api) ->
           delete params[paramName]
         else
           url.replace match, null
-
+      options =
+        dataType: "json"
       return qwest[method](url, params, options).then((response) ->
         success(response) if success?
       )['catch']((e, response) ->
