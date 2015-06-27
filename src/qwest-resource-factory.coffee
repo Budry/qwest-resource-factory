@@ -26,7 +26,7 @@ ResourceFactory = (url, api) ->
 
       params = merge defaultParams, params
 
-      matches = url.match /:([^:]+):/g
+      matches = url.match(/:([^:]+):/g) || []
 
       for match in matches
         paramName = match.substr(1, match.length - 2)
