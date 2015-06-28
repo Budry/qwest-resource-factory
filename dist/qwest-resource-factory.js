@@ -26,11 +26,12 @@
     };
 
     ResourceFactory.prototype.create = function(url, api) {
-      var Resource, action, allowedMethods, before, defaultParams, method, options;
+      var Resource, _url, action, allowedMethods, before, defaultParams, method, options;
       allowedMethods = ["post", "get", "put", "delete"];
       Resource = function() {};
       for (action in api) {
         options = api[action];
+        _url = url;
         if (options.method == null) {
           throw "Missing method for '" + action + "'";
         }
@@ -56,7 +57,7 @@
               error = null;
             }
             params = merge(defaultParams, params);
-            uri = defaultUri = url.match(/^http(s)?:\/\/[^\/]+(.*)$/)[2];
+            uri = defaultUri = _url.match(/^http(s)?:\/\/[^\/]+(.*)$/)[2];
             matches = uri.match(/:([^:]+):/g) || [];
             for (i = 0, len = matches.length; i < len; i++) {
               match = matches[i];
@@ -70,11 +71,11 @@
               }
             }
             uri = uri.replace(/\/{2,}/g, "/");
-            url = url.replace(defaultUri, uri);
+            _url = _url.replace(defaultUri, uri);
             options = {
               dataType: "json"
             };
-            request = qwest[method](url, params, options);
+            request = qwest[method](_url, params, options);
             if (before != null) {
               qwest.before(before());
             }

@@ -22,6 +22,8 @@ class ResourceFactory
 
     for action, options of api
 
+      _url = url
+
       ## Check request method
       if not options.method?
         throw "Missing method for '#{action}'"
@@ -39,7 +41,7 @@ class ResourceFactory
       Resource.prototype[action] = (params = null, success = null, error = null) =>
 
         params = merge defaultParams, params
-        uri = defaultUri = url.match(/^http(s)?:\/\/[^\/]+(.*)$/)[2]
+        uri = defaultUri = _url.match(/^http(s)?:\/\/[^\/]+(.*)$/)[2]
         matches = uri.match(/:([^:]+):/g) || []
 
         for match in matches
@@ -52,12 +54,12 @@ class ResourceFactory
             uri = uri.replace match, ""
 
         uri = uri.replace /\/{2,}/g, "/"
-        url = url.replace defaultUri, uri
+        _url = _url.replace defaultUri, uri
 
         options =
           dataType: "json"
 
-        request = qwest[method](url, params, options)
+        request = qwest[method](_url, params, options)
 
         if before?
           qwest.before before()
