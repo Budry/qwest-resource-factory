@@ -39,19 +39,20 @@ class ResourceFactory
       Resource.prototype[action] = (params = null, success = null, error = null) =>
 
         params = merge defaultParams, params
-        uri = url.match(/^http(s)?:\/\/[^\/]+(.*)$/)[2]
+        uri = defaultUri = url.match(/^http(s)?:\/\/[^\/]+(.*)$/)[2]
         matches = uri.match(/:([^:]+):/g) || []
 
         for match in matches
           paramName = match.substr(1, match.length - 2)
           if params[paramName]?
             value = params[paramName]
-            url = url.replace match, value
+            uri = uri.replace match, value
             delete params[paramName]
           else
-            url = url.replace match, ""
+            uri = uri.replace match, ""
 
-        url = url.replace /\/{2,}/g, "/"
+        uri = uri.replace /\/{2,}/g, "/"
+        url = url.replace defaultUri, uri
 
         options =
           dataType: "json"

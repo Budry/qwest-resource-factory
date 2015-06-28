@@ -45,7 +45,7 @@
         defaultParams = options.params;
         Resource.prototype[action] = (function(_this) {
           return function(params, success, error) {
-            var i, len, match, matches, paramName, request, self, uri, value;
+            var defaultUri, i, len, match, matches, paramName, request, self, uri, value;
             if (params == null) {
               params = null;
             }
@@ -56,20 +56,21 @@
               error = null;
             }
             params = merge(defaultParams, params);
-            uri = url.match(/^http(s)?:\/\/[^\/]+(.*)$/)[2];
+            uri = defaultUri = url.match(/^http(s)?:\/\/[^\/]+(.*)$/)[2];
             matches = uri.match(/:([^:]+):/g) || [];
             for (i = 0, len = matches.length; i < len; i++) {
               match = matches[i];
               paramName = match.substr(1, match.length - 2);
               if (params[paramName] != null) {
                 value = params[paramName];
-                url = url.replace(match, value);
+                uri = uri.replace(match, value);
                 delete params[paramName];
               } else {
-                url = url.replace(match, "");
+                uri = uri.replace(match, "");
               }
             }
-            url = url.replace(/\/{2,}/g, "/");
+            uri = uri.replace(/\/{2,}/g, "/");
+            url = url.replace(defaultUri, uri);
             options = {
               dataType: "json"
             };
