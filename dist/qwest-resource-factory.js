@@ -29,21 +29,23 @@
       var Resource, action, allowedMethods, before, defaultParams, method, options;
       allowedMethods = ["post", "get", "put", "delete"];
       Resource = function() {};
-      before = null;
-      if (api.before != null) {
-        before = api.before;
-        delete api.before;
-      }
       for (action in api) {
         options = api[action];
+        if (options.method == null) {
+          throw "Missing method for '" + action + "'";
+        }
         method = options.method.toLowerCase();
         if (allowedMethods.indexOf(method) === -1) {
           throw "Invalid method";
         }
+        before = null;
+        if (api.before != null) {
+          before = api.before;
+        }
         defaultParams = options.params;
         Resource.prototype[action] = (function(_this) {
           return function(params, success, error) {
-            var i, len, match, matches, paramName, request, self, value;
+            var i, len, match, matches, paramName, request, self, uri, value;
             if (params == null) {
               params = null;
             }
@@ -54,7 +56,8 @@
               error = null;
             }
             params = merge(defaultParams, params);
-            matches = url.match(/:([^:]+):/g) || [];
+            uri = url.match(/^http(s)?:\/\/[^\/]+(.*)$/)[2];
+            matches = uri.match(/:([^:]+):/g) || [];
             for (i = 0, len = matches.length; i < len; i++) {
               match = matches[i];
               paramName = match.substr(1, match.length - 2);
@@ -63,9 +66,10 @@
                 url = url.replace(match, value);
                 delete params[paramName];
               } else {
-                url.replace(match, null);
+                url = url.replace(match, null);
               }
             }
+            url = url.replace(/(.)(?=.*\1)/g, "");
             options = {
               dataType: "json"
             };

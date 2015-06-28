@@ -20,23 +20,27 @@ class ResourceFactory
     allowedMethods = ["post", "get", "put", "delete"]
     Resource = () ->
 
-    before = null
-    if api.before?
-      before = api.before
-      delete api.before
-
     for action, options of api
 
+      ## Check request method
+      if not options.method?
+        throw "Missing method for '#{action}'"
       method = options.method.toLowerCase()
       if allowedMethods.indexOf(method) is -1
         throw "Invalid method"
+
+      ## Set before event
+      before = null
+      if api.before?
+        before = api.before
 
       defaultParams = options.params
 
       Resource.prototype[action] = (params = null, success = null, error = null) =>
 
         params = merge defaultParams, params
-        matches = url.match(/:([^:]+):/g) || []
+        uri = url.match(/^http(s)?:\/\/[^\/]+(.*)$/)[2]
+        matches = uri.match(/:([^:]+):/g) || []
 
         for match in matches
           paramName = match.substr(1, match.length - 2)
@@ -45,7 +49,9 @@ class ResourceFactory
             url = url.replace match, value
             delete params[paramName]
           else
-            url.replace match, null
+            url = url.replace match, null
+
+        url = url.replace /(.)(?=.*\1)/g, ""
 
         options =
           dataType: "json"
