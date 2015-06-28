@@ -49,9 +49,9 @@ class ResourceFactory
             url = url.replace match, value
             delete params[paramName]
           else
-            url = url.replace match, null
+            url = url.replace match, ""
 
-        url = url.replace /(.)(?=.*\1)/g, ""
+        url = url.replace /\/{2,}/g, "/"
 
         options =
           dataType: "json"
