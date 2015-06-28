@@ -9,40 +9,62 @@
 qwest = require "qwest"
 merge = require "merge"
 
-ResourceFactory = (url, api) ->
+class ResourceFactory
 
-  allowedMethods = ["post", "get", "put", "delete"]
-  Resource = () ->
+  onError: (@onError) ->
 
-  for action, options of api
+  onSuccess: (@onSuccess) ->
 
-    method = options.method.toLowerCase()
-    if allowedMethods.indexOf(method) is -1
-      throw "Invalid method"
+  create: (url, api) ->
 
-    defaultParams = options.params
+    allowedMethods = ["post", "get", "put", "delete"]
+    Resource = () ->
 
-    Resource.prototype[action] = (params = null, success = null, error = null) ->
+    before = null
+    if api.before?
+      before = api.before
+      delete api.before
 
-      params = merge defaultParams, params
-      matches = url.match(/:([^:]+):/g) || []
+    for action, options of api
 
-      for match in matches
-        paramName = match.substr(1, match.length - 2)
-        if params[paramName]?
-          value = params[paramName]
-          url = url.replace match, value
-          delete params[paramName]
-        else
-          url.replace match, null
-      options =
-        dataType: "json"
-      return qwest[method](url, params, options).then((response) ->
-        success(response) if success?
-      )['catch']((e, response) ->
-        error(e, response) if error?
-      )
+      method = options.method.toLowerCase()
+      if allowedMethods.indexOf(method) is -1
+        throw "Invalid method"
 
-  return new Resource()
+      defaultParams = options.params
 
-module.exports = ResourceFactory
+      Resource.prototype[action] = (params = null, success = null, error = null) =>
+
+        params = merge defaultParams, params
+        matches = url.match(/:([^:]+):/g) || []
+
+        for match in matches
+          paramName = match.substr(1, match.length - 2)
+          if params[paramName]?
+            value = params[paramName]
+            url = url.replace match, value
+            delete params[paramName]
+          else
+            url.replace match, null
+
+        options =
+          dataType: "json"
+
+        request = qwest[method](url, params, options)
+
+        if before?
+          qwest.before before()
+
+        self = @
+
+        return request.then((response) ->
+          self.onSuccess(response) if self.onSuccess?
+          success(response) if success?
+        )['catch']((e, response) ->
+          self.onError(e, response) if self.onError?
+          error(e, response) if error?
+        )
+
+    return new Resource()
+
+module.exports = new ResourceFactory()

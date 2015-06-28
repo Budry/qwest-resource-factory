@@ -14,58 +14,91 @@
 
   merge = require("merge");
 
-  ResourceFactory = function(url, api) {
-    var Resource, action, allowedMethods, defaultParams, method, options;
-    allowedMethods = ["post", "get", "put", "delete"];
-    Resource = function() {};
-    for (action in api) {
-      options = api[action];
-      method = options.method.toLowerCase();
-      if (allowedMethods.indexOf(method) === -1) {
-        throw "Invalid method";
-      }
-      defaultParams = options.params;
-      Resource.prototype[action] = function(params, success, error) {
-        var i, len, match, matches, paramName, value;
-        if (params == null) {
-          params = null;
-        }
-        if (success == null) {
-          success = null;
-        }
-        if (error == null) {
-          error = null;
-        }
-        params = merge(defaultParams, params);
-        matches = url.match(/:([^:]+):/g) || [];
-        for (i = 0, len = matches.length; i < len; i++) {
-          match = matches[i];
-          paramName = match.substr(1, match.length - 2);
-          if (params[paramName] != null) {
-            value = params[paramName];
-            url = url.replace(match, value);
-            delete params[paramName];
-          } else {
-            url.replace(match, null);
-          }
-        }
-        options = {
-          dataType: "json"
-        };
-        return qwest[method](url, params, options).then(function(response) {
-          if (success != null) {
-            return success(response);
-          }
-        })['catch'](function(e, response) {
-          if (error != null) {
-            return error(e, response);
-          }
-        });
-      };
-    }
-    return new Resource();
-  };
+  ResourceFactory = (function() {
+    function ResourceFactory() {}
 
-  module.exports = ResourceFactory;
+    ResourceFactory.prototype.onError = function(onError) {
+      this.onError = onError;
+    };
+
+    ResourceFactory.prototype.onSuccess = function(onSuccess) {
+      this.onSuccess = onSuccess;
+    };
+
+    ResourceFactory.prototype.create = function(url, api) {
+      var Resource, action, allowedMethods, before, defaultParams, method, options;
+      allowedMethods = ["post", "get", "put", "delete"];
+      Resource = function() {};
+      before = null;
+      if (api.before != null) {
+        before = api.before;
+        delete api.before;
+      }
+      for (action in api) {
+        options = api[action];
+        method = options.method.toLowerCase();
+        if (allowedMethods.indexOf(method) === -1) {
+          throw "Invalid method";
+        }
+        defaultParams = options.params;
+        Resource.prototype[action] = (function(_this) {
+          return function(params, success, error) {
+            var i, len, match, matches, paramName, request, self, value;
+            if (params == null) {
+              params = null;
+            }
+            if (success == null) {
+              success = null;
+            }
+            if (error == null) {
+              error = null;
+            }
+            params = merge(defaultParams, params);
+            matches = url.match(/:([^:]+):/g) || [];
+            for (i = 0, len = matches.length; i < len; i++) {
+              match = matches[i];
+              paramName = match.substr(1, match.length - 2);
+              if (params[paramName] != null) {
+                value = params[paramName];
+                url = url.replace(match, value);
+                delete params[paramName];
+              } else {
+                url.replace(match, null);
+              }
+            }
+            options = {
+              dataType: "json"
+            };
+            request = qwest[method](url, params, options);
+            if (before != null) {
+              qwest.before(before());
+            }
+            self = _this;
+            return request.then(function(response) {
+              if (self.onSuccess != null) {
+                self.onSuccess(response);
+              }
+              if (success != null) {
+                return success(response);
+              }
+            })['catch'](function(e, response) {
+              if (self.onError != null) {
+                self.onError(e, response);
+              }
+              if (error != null) {
+                return error(e, response);
+              }
+            });
+          };
+        })(this);
+      }
+      return new Resource();
+    };
+
+    return ResourceFactory;
+
+  })();
+
+  module.exports = new ResourceFactory();
 
 }).call(this);
