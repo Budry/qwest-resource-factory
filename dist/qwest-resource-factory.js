@@ -17,6 +17,8 @@
   ResourceFactory = (function() {
     function ResourceFactory() {}
 
+    ResourceFactory.prototype.allowedMethods = ["post", "put", "get", "delete"];
+
     ResourceFactory.prototype.onError = function(onError) {
       this.onError = onError;
     };
@@ -25,80 +27,99 @@
       this.onSuccess = onSuccess;
     };
 
-    ResourceFactory.prototype.create = function(url, api) {
-      var Resource, _url, action, allowedMethods, before, defaultParams, method, options;
-      allowedMethods = ["post", "get", "put", "delete"];
-      Resource = function() {};
+    ResourceFactory.prototype.create = function(url1, api) {
+      var action, before, methods, options;
+      this.url = url1;
+      methods = {};
+      before = null;
+      if (api.before != null) {
+        before = api.before;
+        delete api.before;
+      }
       for (action in api) {
         options = api[action];
-        _url = url;
-        if (options.method == null) {
-          throw "Missing method for '" + action + "'";
+        if (before != null) {
+          options.before = before;
         }
-        method = options.method.toLowerCase();
-        if (allowedMethods.indexOf(method) === -1) {
-          throw "Invalid method";
-        }
-        before = null;
-        if (api.before != null) {
-          before = api.before;
-        }
-        defaultParams = options.params;
-        Resource.prototype[action] = (function(_this) {
-          return function(params, success, error) {
-            var defaultUri, i, len, match, matches, paramName, request, self, uri, value;
-            if (params == null) {
-              params = null;
-            }
-            if (success == null) {
-              success = null;
-            }
-            if (error == null) {
-              error = null;
-            }
-            params = merge(defaultParams, params);
-            uri = defaultUri = _url.match(/^http(s)?:\/\/[^\/]+(.*)$/)[2];
-            matches = uri.match(/:([^:]+):/g) || [];
-            for (i = 0, len = matches.length; i < len; i++) {
-              match = matches[i];
-              paramName = match.substr(1, match.length - 2);
-              if (params[paramName] != null) {
-                value = params[paramName];
-                uri = uri.replace(match, value);
-                delete params[paramName];
-              } else {
-                uri = uri.replace(match, "");
-              }
-            }
-            uri = uri.replace(/\/{2,}/g, "/");
-            _url = _url.replace(defaultUri, uri);
-            options = {
-              dataType: "json"
-            };
-            request = qwest[method](_url, params, options);
-            if (before != null) {
-              qwest.before(before());
-            }
-            self = _this;
-            return request.then(function(response) {
-              if (self.onSuccess != null) {
-                self.onSuccess(response);
-              }
-              if (success != null) {
-                return success(response);
-              }
-            })['catch'](function(e, response) {
-              if (self.onError != null) {
-                self.onError(e, response);
-              }
-              if (error != null) {
-                return error(e, response);
-              }
-            });
-          };
-        })(this);
+        methods[action] = this._createQwest(options);
       }
-      return new Resource();
+      return methods;
+    };
+
+    ResourceFactory.prototype._parseUrl = function(params) {
+      var defaultUri, i, len, match, matches, paramName, uri, url, urlMatches, value;
+      if (params == null) {
+        params = {};
+      }
+      urlMatches = this.url.match(/^http(s)?:\/\/[^\/]+(.*)$/);
+      if (urlMatches.length < 3) {
+        throw "Invalid URL";
+      }
+      uri = defaultUri = urlMatches[2];
+      matches = uri.match(/:([^:]+):/g) || [];
+      for (i = 0, len = matches.length; i < len; i++) {
+        match = matches[i];
+        paramName = match.substr(1, match.length - 2);
+        if (params[paramName] != null) {
+          value = params[paramName];
+          uri = uri.replace(match, value);
+          delete params[paramName];
+        } else {
+          uri = uri.replace(match, "");
+        }
+      }
+      uri = uri.replace(/\/{2,}/g, "/");
+      url = this.url.replace(defaultUri, uri);
+      return url;
+    };
+
+    ResourceFactory.prototype._createQwest = function(options) {
+      var callback, qwestConfiguration;
+      if (options.method == null) {
+        throw "Missing method options";
+      }
+      options.method = options.method.toLowerCase();
+      if (this.allowedMethods.indexOf(options.method) === -1) {
+        throw "Invalid method '" + method + "'";
+      }
+      qwestConfiguration = {
+        dataType: "json"
+      };
+      return callback = (function(_this) {
+        return function(params, success, error) {
+          var qwestInstance, self;
+          if (params == null) {
+            params = {};
+          }
+          if (success == null) {
+            success = null;
+          }
+          if (error == null) {
+            error = null;
+          }
+          params = merge(options.params, params);
+          qwestInstance = qwest[options.method](_this._parseUrl(params), params, qwestConfiguration);
+          if (options.before != null) {
+            qwestInstance.before(options.before());
+          }
+          self = _this;
+          return qwestInstance.then(function(response) {
+            if (self.onSuccess != null) {
+              self.onSuccess(response);
+            }
+            if (success != null) {
+              return success(response);
+            }
+          })['catch'](function(e, response) {
+            if (self.onError != null) {
+              self.onError(e, response);
+            }
+            if (error != null) {
+              return error(e, response);
+            }
+          });
+        };
+      })(this);
     };
 
     return ResourceFactory;
