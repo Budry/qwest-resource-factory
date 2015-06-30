@@ -19,18 +19,6 @@
 
     ResourceFactory.prototype.allowedMethods = ["post", "put", "get", "delete"];
 
-    ResourceFactory.prototype.onError = null;
-
-    ResourceFactory.prototype.onSuccess = null;
-
-    ResourceFactory.prototype.onError = function(onError) {
-      this.onError = onError;
-    };
-
-    ResourceFactory.prototype.onSuccess = function(onSuccess) {
-      this.onSuccess = onSuccess;
-    };
-
     ResourceFactory.prototype.create = function(url, api) {
       var action, before, methods, options;
       methods = {};
@@ -90,7 +78,7 @@
       };
       return callback = (function(_this) {
         return function(params, success, error) {
-          var qwestInstance, self;
+          var qwestInstance;
           if (params == null) {
             params = {};
           }
@@ -105,18 +93,11 @@
           if (options.before != null) {
             qwestInstance.before(options.before());
           }
-          self = _this;
           return qwestInstance.then(function(response) {
-            if (self.onSuccess != null) {
-              self.onSuccess(response);
-            }
             if (success != null) {
               return success(response);
             }
           })['catch'](function(e, response) {
-            if (self.onError != null) {
-              self.onError(e, response);
-            }
             if (error != null) {
               return error(e, response);
             }

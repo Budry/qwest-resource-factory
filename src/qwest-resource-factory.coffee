@@ -12,12 +12,6 @@ merge = require "merge"
 class ResourceFactory
 
   allowedMethods: ["post", "put", "get", "delete"]
-  onError: null
-  onSuccess: null
-
-  onError: (@onError) ->
-
-  onSuccess: (@onSuccess) ->
 
   create: (url, api) ->
 
@@ -77,12 +71,9 @@ class ResourceFactory
       if options.before?
         qwestInstance.before options.before()
 
-      self = @
       return qwestInstance.then((response) ->
-        self.onSuccess(response) if self.onSuccess?
         success(response) if success?
       )['catch']((e, response) ->
-        self.onError(e, response) if self.onError?
         error(e, response) if error?
       )
 
