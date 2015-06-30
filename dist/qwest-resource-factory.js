@@ -27,9 +27,8 @@
       this.onSuccess = onSuccess;
     };
 
-    ResourceFactory.prototype.create = function(url1, api) {
+    ResourceFactory.prototype.create = function(url, api) {
       var action, before, methods, options;
-      this.url = url1;
       methods = {};
       before = null;
       if (api.before != null) {
@@ -41,17 +40,17 @@
         if (before != null) {
           options.before = before;
         }
-        methods[action] = this._createQwest(options);
+        methods[action] = this._createQwest(url, options);
       }
       return methods;
     };
 
-    ResourceFactory.prototype._parseUrl = function(params) {
-      var defaultUri, i, len, match, matches, paramName, uri, url, urlMatches, value;
+    ResourceFactory.prototype._parseUrl = function(url, params) {
+      var defaultUri, i, len, match, matches, paramName, uri, urlMatches, value;
       if (params == null) {
         params = {};
       }
-      urlMatches = this.url.match(/^http(s)?:\/\/[^\/]+(.*)$/);
+      urlMatches = url.match(/^http(s)?:\/\/[^\/]+(.*)$/);
       if (urlMatches.length < 3) {
         throw "Invalid URL";
       }
@@ -69,11 +68,11 @@
         }
       }
       uri = uri.replace(/\/{2,}/g, "/");
-      url = this.url.replace(defaultUri, uri);
+      url = url.replace(defaultUri, uri);
       return url;
     };
 
-    ResourceFactory.prototype._createQwest = function(options) {
+    ResourceFactory.prototype._createQwest = function(url, options) {
       var callback, qwestConfiguration;
       if (options.method == null) {
         throw "Missing method options";
@@ -98,7 +97,7 @@
             error = null;
           }
           params = merge(options.params, params);
-          qwestInstance = qwest[options.method](_this._parseUrl(params), params, qwestConfiguration);
+          qwestInstance = qwest[options.method](_this._parseUrl(url, params), params, qwestConfiguration);
           if (options.before != null) {
             qwestInstance.before(options.before());
           }

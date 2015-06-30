@@ -17,7 +17,7 @@ class ResourceFactory
 
   onSuccess: (@onSuccess) ->
 
-  create: (@url, api) ->
+  create: (url, api) ->
 
     methods = {}
 
@@ -31,12 +31,12 @@ class ResourceFactory
       if before?
         options.before = before
 
-      methods[action] = @_createQwest options
+      methods[action] = @_createQwest url, options
 
     return methods
 
-  _parseUrl: (params = {}) ->
-    urlMatches = @url.match(/^http(s)?:\/\/[^\/]+(.*)$/)
+  _parseUrl: (url, params = {}) ->
+    urlMatches = url.match(/^http(s)?:\/\/[^\/]+(.*)$/)
     if urlMatches.length < 3
       throw "Invalid URL"
     uri = defaultUri = urlMatches[2]
@@ -52,11 +52,11 @@ class ResourceFactory
         uri = uri.replace match, ""
 
     uri = uri.replace /\/{2,}/g, "/"
-    url = @url.replace defaultUri, uri
+    url = url.replace defaultUri, uri
 
     return url
 
-  _createQwest: (options) ->
+  _createQwest: (url, options) ->
 
     if not options.method?
       throw "Missing method options"
@@ -70,7 +70,7 @@ class ResourceFactory
     callback = (params = {}, success = null, error = null) =>
 
       params = merge options.params, params
-      qwestInstance = qwest[options.method](@_parseUrl(params), params, qwestConfiguration)
+      qwestInstance = qwest[options.method](@_parseUrl(url, params), params, qwestConfiguration)
 
       if options.before?
         qwestInstance.before options.before()
