@@ -12,6 +12,8 @@ merge = require "merge"
 class ResourceFactory
 
   allowedMethods: ["post", "put", "get", "delete"]
+  onError: null
+  onSuccess: null
 
   onError: (@onError) ->
 

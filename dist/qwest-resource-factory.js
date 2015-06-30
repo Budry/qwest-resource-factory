@@ -19,6 +19,10 @@
 
     ResourceFactory.prototype.allowedMethods = ["post", "put", "get", "delete"];
 
+    ResourceFactory.prototype.onError = null;
+
+    ResourceFactory.prototype.onSuccess = null;
+
     ResourceFactory.prototype.onError = function(onError) {
       this.onError = onError;
     };
