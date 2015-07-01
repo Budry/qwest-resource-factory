@@ -77,15 +77,15 @@
         dataType: "json"
       };
       callback = (function(_this) {
-        return function(params, success, error) {
+        return function(params, successCallback, errorCallback) {
           if (params == null) {
             params = {};
           }
-          if (success == null) {
-            success = null;
+          if (successCallback == null) {
+            successCallback = null;
           }
-          if (error == null) {
-            error = null;
+          if (errorCallback == null) {
+            errorCallback = null;
           }
           return new Promise(function(resolve, reject) {
             var qwestInstance;
@@ -95,13 +95,13 @@
               qwestInstance.before(options.before());
             }
             return qwestInstance.then(function(response) {
-              if (success != null) {
-                success(response);
+              if (successCallback != null) {
+                successCallback(response);
               }
               return resolve(response);
-            })['catch'](function(error, response) {
-              if (error != null) {
-                error(error, response);
+            })['catch'](function(err, response) {
+              if (errorCallback != null) {
+                errorCallback(err, response);
               }
               return reject(error);
             });

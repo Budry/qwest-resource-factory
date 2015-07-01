@@ -63,7 +63,7 @@ class ResourceFactory
     qwestConfiguration =
       dataType: "json"
 
-    callback = (params = {}, success = null, error = null) =>
+    callback = (params = {}, successCallback = null, errorCallback = null) =>
       return new Promise (resolve, reject) =>
         params = merge options.params, params
         qwestInstance = qwest[options.method](@_parseUrl(url, params), params, qwestConfiguration)
@@ -72,10 +72,10 @@ class ResourceFactory
           qwestInstance.before options.before()
 
         qwestInstance.then((response) ->
-          success(response) if success?
+          successCallback(response) if successCallback?
           resolve response
-        )['catch']((error, response) ->
-          error(error, response) if error?
+        )['catch']((err, response) ->
+          errorCallback(err, response) if errorCallback?
           reject error
         )
 
