@@ -76,9 +76,8 @@
       qwestConfiguration = {
         dataType: "json"
       };
-      return callback = (function(_this) {
+      callback = (function(_this) {
         return function(params, success, error) {
-          var qwestInstance;
           if (params == null) {
             params = {};
           }
@@ -88,22 +87,28 @@
           if (error == null) {
             error = null;
           }
-          params = merge(options.params, params);
-          qwestInstance = qwest[options.method](_this._parseUrl(url, params), params, qwestConfiguration);
-          if (options.before != null) {
-            qwestInstance.before(options.before());
-          }
-          return qwestInstance.then(function(response) {
-            if (success != null) {
-              return success(response);
+          return new Promise(function(resolve, reject) {
+            var qwestInstance;
+            params = merge(options.params, params);
+            qwestInstance = qwest[options.method](this._parseUrl(url, params), params, qwestConfiguration);
+            if (options.before != null) {
+              qwestInstance.before(options.before());
             }
-          })['catch'](function(e, response) {
-            if (error != null) {
-              return error(e, response);
-            }
+            return qwestInstance.then(function(response) {
+              if (success != null) {
+                success(response);
+              }
+              return resolve(response);
+            })['catch'](function(error, response) {
+              if (error != null) {
+                error(error, response);
+              }
+              return reject(error);
+            });
           });
         };
       })(this);
+      return callback;
     };
 
     return ResourceFactory;
