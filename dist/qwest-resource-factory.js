@@ -103,7 +103,7 @@
               if (errorCallback != null) {
                 errorCallback(err, response);
               }
-              return reject(error);
+              return reject(err);
             });
           });
         };

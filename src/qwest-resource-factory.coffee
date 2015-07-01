@@ -76,7 +76,7 @@ class ResourceFactory
           resolve response
         )['catch']((err, response) ->
           errorCallback(err, response) if errorCallback?
-          reject error
+          reject err
         )
 
     return callback
