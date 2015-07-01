@@ -64,7 +64,7 @@ class ResourceFactory
       dataType: "json"
 
     callback = (params = {}, success = null, error = null) =>
-      return new Promise (resolve, reject) ->
+      return new Promise (resolve, reject) =>
         params = merge options.params, params
         qwestInstance = qwest[options.method](@_parseUrl(url, params), params, qwestConfiguration)
 

@@ -90,7 +90,7 @@
           return new Promise(function(resolve, reject) {
             var qwestInstance;
             params = merge(options.params, params);
-            qwestInstance = qwest[options.method](this._parseUrl(url, params), params, qwestConfiguration);
+            qwestInstance = qwest[options.method](_this._parseUrl(url, params), params, qwestConfiguration);
             if (options.before != null) {
               qwestInstance.before(options.before());
             }
