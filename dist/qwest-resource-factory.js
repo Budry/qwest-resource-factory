@@ -105,7 +105,10 @@
               if (errorCallback != null) {
                 errorCallback(err, response);
               }
-              return reject(err, response);
+              return reject({
+                err: err,
+                response: response
+              });
             });
           });
         };
