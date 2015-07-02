@@ -8,11 +8,13 @@
  */
 
 (function() {
-  var ResourceFactory, merge, qwest;
+  var Promise, ResourceFactory, objectAssign, qwest;
 
   qwest = require("qwest");
 
-  merge = require("merge");
+  objectAssign = require("object-assign");
+
+  Promise = require("bluebird");
 
   ResourceFactory = (function() {
     function ResourceFactory() {}
@@ -89,7 +91,7 @@
           }
           return new Promise(function(resolve, reject) {
             var qwestInstance;
-            params = merge(options.params, params);
+            params = objectAssign({}, options.params, params);
             qwestInstance = qwest[options.method](_this._parseUrl(url, params), params, qwestConfiguration);
             if (options.before != null) {
               qwestInstance.before(options.before());

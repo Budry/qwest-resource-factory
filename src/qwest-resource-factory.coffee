@@ -7,7 +7,8 @@
 ###
 
 qwest = require "qwest"
-merge = require "merge"
+objectAssign = require "object-assign"
+Promise = require "bluebird"
 
 class ResourceFactory
 
@@ -65,7 +66,7 @@ class ResourceFactory
 
     callback = (params = {}, successCallback = null, errorCallback = null) =>
       return new Promise (resolve, reject) =>
-        params = merge options.params, params
+        params = objectAssign {}, options.params, params
         qwestInstance = qwest[options.method](@_parseUrl(url, params), params, qwestConfiguration)
 
         if options.before?
