@@ -156,8 +156,8 @@ class ResourceFactory {
 
     const callback = (params = {}) => {
       return new Promise((resolve, reject) => {
-        const params = objectAssign({}, options.params, params)
-        const qwestInstance = qwest.map(options.method, this._parseUrl(url, params), params, qwestConfiguration, before)
+        const realParams = objectAssign({}, options.params, params)
+        const qwestInstance = qwest.map(options.method, this._parseUrl(url, realParams), realParams, qwestConfiguration, before)
         .then((xhr, response) => {
           after(xhr, response)
           resolve(response, xhr)
