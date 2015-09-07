@@ -147,6 +147,8 @@ class ResourceFactory {
         })
       })
     }
+
+    return callback
   }
 
 }
