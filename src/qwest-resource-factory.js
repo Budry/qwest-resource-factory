@@ -15,6 +15,11 @@ class ResourceFactory {
   constructor() {
     this.before = []
     this.after = []
+    this.headers = []
+  }
+
+  setHeader(name, value) {
+    this.headers[name] = value
   }
 
   /**
@@ -134,6 +139,7 @@ class ResourceFactory {
 
     const qwestConfiguration = {
       dataType: 'json'
+      headers: this.headers
     }
 
     const before = (xhr) => {
