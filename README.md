@@ -10,19 +10,23 @@ npm install --save qwest-resource-factory
 
 ## Usages
 
-```coffee
-resourceFactory = require "qwest-resource-factory"
+```js
+import ResourceFactory from 'qwest-resource-factory'
 
-UsersResource = resourceFactory "http://api.example.com/v1/users/:id:", 
-    create:
-        method: "post"
-    update:
-        method: "put"
+UsersResource = ResourceFactory.create('http://api.example.com/v1/users/:id:', {
+    create: {
+        method: 'POST'
+    },
+    update: {
+        method: 'PUT',
         params:
             id: 1
+    }
+})
 
-UserResource.create(name: "Foo").then () ->
-    console.log "Ok"
-.catch () ->
-    console.log "Err"
+UserResource.create({name: "Foo"}).then(() => {
+    console.log("Ok")
+}).catch(() => {
+    console.log("Err")
+})
 ```
