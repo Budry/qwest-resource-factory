@@ -70,10 +70,19 @@ class ResourceFactory {
       delete api.before
     }
 
+    let after = null
+    if (api.hasOwnProperty('after')) {
+      after = api.after
+      delete api.after
+    }
+
     for(let method in api) {
       let options = api[method]
       if (before !== null) {
         options.before = before
+      }
+      if (after !== null) {
+        options.after = after
       }
       methods[method] = this._createQwest(url, options)
     }
@@ -136,11 +145,21 @@ class ResourceFactory {
       }
     }
 
+    const after = (xhr, response) => {
+      this.after.forEach((callback) => {
+        callback(xhr, response)
+      })
+      if (options.hasOwnProperty('after') && typeof(options.after) === 'function') {
+        options.after(xhr)
+      }
+    }
+
     const callback = (params = {}) => {
       return new Promise((resolve, reject) => {
         const params = objectAssign({}, options.params, params)
         const qwestInstance = qwest.map(options.method, this._parseUrl(url, params), params, qwestConfiguration, before)
         .then((xhr, response) => {
+          after(xhr, response)
           resolve(response, xhr)
         }).catch((xhr, response, e) => {
           reject(err, response, xhr)
