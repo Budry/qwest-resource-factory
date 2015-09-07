@@ -138,7 +138,7 @@ class ResourceFactory {
   _createQwest(url, options) {
 
     const qwestConfiguration = {
-      dataType: 'json'
+      dataType: 'json',
       headers: this.headers
     }
 
