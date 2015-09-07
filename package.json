@@ -1,14 +1,13 @@
 {
   "name": "qwest-resource-factory",
-  "version": "0.9.0",
+  "version": "0.0.2",
   "description": "Small library for better works with resources and qwest package",
-  "main": "dist/qwest-resource-factory.js",
+  "main": "src/qwest-resource-factory.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/Budry/qwest-resource-factory.git"
   },
   "keywords": [
-    "kappajs",
     "resource",
     "qwest",
     "factory"
@@ -22,10 +21,5 @@
     "bluebird": "^2.9.30",
     "object-assign": "^3.0.0",
     "qwest": "~1.7"
-  },
-  "devDependencies": {
-    "gulp": "~3.9.0",
-    "gulp-coffee": "~2.3.1",
-    "coffee-script": "~1.9.3"
   }
 }
