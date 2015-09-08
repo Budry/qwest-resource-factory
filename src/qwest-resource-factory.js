@@ -165,10 +165,10 @@ class ResourceFactory {
         const realParams = objectAssign({}, options.params, params)
         const qwestInstance = qwest.map(options.method, this._parseUrl(url, realParams), realParams, qwestConfiguration, before)
         .then((xhr, response) => {
-          after(xhr, response)
-          resolve(response, xhr)
+          after(response)
+          resolve(response)
         }).catch((xhr, response, err) => {
-          reject(err, response, xhr)
+          reject(response)
         })
       })
     }
