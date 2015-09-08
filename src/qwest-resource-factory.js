@@ -167,7 +167,7 @@ class ResourceFactory {
         .then((xhr, response) => {
           after(xhr, response)
           resolve(response, xhr)
-        }).catch((xhr, response, e) => {
+        }).catch((xhr, response, err) => {
           reject(err, response, xhr)
         })
       })
